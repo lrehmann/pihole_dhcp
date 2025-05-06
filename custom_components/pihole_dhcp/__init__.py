@@ -18,3 +18,13 @@ from .coordinator import PiholeUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS: list[str] = ["sensor", "binary_sensor"]
+
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up from a UI config entry."""
+    # your existing setup logic…
+    return True
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Unload a config entry."""
+    # your existing teardown logic…
+    return True
