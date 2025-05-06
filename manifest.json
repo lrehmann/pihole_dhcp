@@ -1,0 +1,10 @@
+{
+  "domain": "pihole_dhcp",
+  "name": "Pi‑hole DHCP Presence",
+  "version": "0.2.0",
+  "iot_class": "local_polling",
+  "documentation": "https://github.com/lukerehmann/pihole_dhcp",
+  "dependencies": [],
+  "codeowners": ["@lukerehmann"],
+  "requirements": []
+}
