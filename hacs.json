@@ -1,0 +1,9 @@
+{
+  "name": "Pi‑hole DHCP Presence",
+  "domains": ["pihole_dhcp"],
+  "country": "US",
+  "homeassistant": "2023.0.0",
+  "iot_class": "local_polling",
+  "content_in_root": false,
+  "render_readme": true
+}
