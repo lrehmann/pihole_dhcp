@@ -3,8 +3,9 @@
   "name": "Pi‑hole DHCP Presence",
   "version": "0.2.0",
   "iot_class": "local_polling",
-  "documentation": "https://github.com/lukerehmann/pihole_dhcp",
+  "documentation": "https://github.com/lrehmann/pihole_dhcp",
+  "requirements": [],
   "dependencies": [],
-  "codeowners": ["@lukerehmann"],
-  "requirements": []
+  "codeowners": ["@lrehmann"],
+  "config_flow": true
 }
