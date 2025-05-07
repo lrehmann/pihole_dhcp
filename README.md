@@ -33,6 +33,8 @@ A Home Assistant custom integration that leverages Pi‑hole’s DHCP and netw
 
 ---
 
+** Settings -> System -> 'Flush Network Table' before install is recommended to avoid importing stale devices into your HA instance **
+
 ## Features
 
 * 🔎 **Unified Device Registry**
