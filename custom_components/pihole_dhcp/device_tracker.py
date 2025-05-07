@@ -36,13 +36,13 @@ class PiholeTracker(CoordinatorEntity, TrackerEntity):
         self._mac = mac
         self._away = away_time
         self._attr_unique_id = f"{DOMAIN}_{mac.replace(':','')}_pihole"
-        self._attr_name = "Presence via Pi-hole"
+        self._attr_name = "Presence via Pi‑hole"
 
     @property
     def is_connected(self) -> bool:
+        """True if device has queried Pi-hole within away_time, False otherwise."""
         last = self.coordinator.data[self._mac].get(ATTR_LAST_QUERY)
         if not isinstance(last, (int, float)):
-            # treat missing timestamp as away
             return False
         return (datetime.now(timezone.utc).timestamp() - last) <= self._away
 
@@ -56,13 +56,14 @@ class PiholeTracker(CoordinatorEntity, TrackerEntity):
 
     @property
     def device_info(self) -> DeviceInfo:
-        data = self.coordinator.data[self._mac]
-        name = data.get(ATTR_NAME)
+        """Attach tracker under the existing device by MAC."""
+        info = self.coordinator.data[self._mac]
+        name = info.get(ATTR_NAME)
         if not name or name == "*" or not name.strip():
             name = self._mac
         return DeviceInfo(
             connections={(CONNECTION_NETWORK_MAC, self._mac)},
             name=name,
-            manufacturer=data.get(ATTR_MAC_VENDOR),
+            manufacturer=info.get(ATTR_MAC_VENDOR),
             model=None,
         )
