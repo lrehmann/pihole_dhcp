@@ -1,4 +1,4 @@
-# Pi‑hole DHCP Presence
+# Pi‑hole Presence
 
 **Version:** 0.2.1
 **Domain:** `pihole_dhcp`
