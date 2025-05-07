@@ -1,11 +1,10 @@
 from __future__ import annotations
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, List
 
 from homeassistant.components.sensor import (
     SensorEntity,
-    STATE_CLASS_TOTAL_INCREASING,
-    STATE_CLASS_MEASUREMENT,
+    SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -25,7 +24,7 @@ from .const import (
     ATTR_NAME,
 )
 
-# (attribute, friendly label)
+# Define each attribute and its friendly label
 _SENSOR_DEFS: List[tuple[str, str]] = [
     (ATTR_FIRST_SEEN,   "First Seen"),
     (ATTR_LAST_QUERY,   "Last Query (s ago)"),
@@ -43,7 +42,7 @@ async def async_setup_entry(
 ) -> None:
     """Create one diagnostic sensor per (MAC, attribute)."""
     coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
-    sensors: List[SensorEntity] = [
+    sensors = [
         PiholeAttrSensor(coordinator, mac, attr, label)
         for mac in coordinator.data
         for attr, label in _SENSOR_DEFS
@@ -51,7 +50,7 @@ async def async_setup_entry(
     async_add_entities(sensors)
 
 class PiholeAttrSensor(CoordinatorEntity, SensorEntity):
-    """Generic diagnostic sensor for a Pi-hole DHCP attribute."""
+    """Generic diagnostic sensor for a Pi‑hole DHCP attribute."""
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(
@@ -68,14 +67,15 @@ class PiholeAttrSensor(CoordinatorEntity, SensorEntity):
         self._attr_unique_id = f"{DOMAIN}_{mac.replace(':','')}_{key}"
         self._attr_name = label
 
-        # Mark last_query & query_count as statistics
+        # Mark statistics
         if attr == ATTR_NUM_QUERIES:
-            self._attr_state_class = STATE_CLASS_TOTAL_INCREASING
+            self._attr_state_class = SensorStateClass.TOTAL_INCREASING
         elif attr == ATTR_LAST_QUERY:
-            self._attr_state_class = STATE_CLASS_MEASUREMENT
+            self._attr_state_class = SensorStateClass.MEASUREMENT
 
     @property
     def native_value(self) -> Any:
+        """Return formatted value for this attribute."""
         data = self.coordinator.data[self._mac]
         val = data.get(self._attr)
         now_ts = datetime.now(timezone.utc).timestamp()
@@ -83,22 +83,21 @@ class PiholeAttrSensor(CoordinatorEntity, SensorEntity):
         if self._attr == ATTR_FIRST_SEEN and isinstance(val, (int, float)):
             return datetime.fromtimestamp(val, timezone.utc).isoformat()
         if self._attr == ATTR_LAST_QUERY and isinstance(val, (int, float)):
-            # seconds ago
-            return int(now_ts - val)
+            return int(now_ts - val)  # seconds ago
         if self._attr == ATTR_DHCP_EXPIRES and isinstance(val, (int, float)):
-            # hours remaining
-            return round((val - now_ts) / 3600, 1)
+            return round((val - now_ts) / 3600, 1)  # hours remaining
         return val
 
     @property
     def device_info(self) -> DeviceInfo:
-        data = self.coordinator.data[self._mac]
-        name = data.get(ATTR_NAME)
+        """Attach sensor under the existing device by MAC."""
+        info = self.coordinator.data[self._mac]
+        name = info.get(ATTR_NAME)
         if not name or name == "*" or not name.strip():
             name = self._mac
         return DeviceInfo(
             connections={(CONNECTION_NETWORK_MAC, self._mac)},
             name=name,
-            manufacturer=data.get(ATTR_MAC_VENDOR),
+            manufacturer=info.get(ATTR_MAC_VENDOR),
             model=None,
         )
