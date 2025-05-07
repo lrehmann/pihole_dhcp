@@ -38,7 +38,7 @@ A Home Assistant custom integration that leverages Pi‑hole’s DHCP and netw
 ## Features
 
 * 🔎 **Unified Device Registry**
-  Merges Pi‑hole DHCP data with existing HA devices based on MAC address (`connections`). No duplicate `eth0` entries.
+  Merges Pi‑hole Network Statistics and DHCP data with existing HA devices based on MAC address (`connections`).
 
 * 📊 **Diagnostic Sensors**
   Exposes:
@@ -47,7 +47,7 @@ A Home Assistant custom integration that leverages Pi‑hole’s DHCP and netw
   * *Last Query (seconds ago)*
   * *Query Count* (cumulative, `total_increasing`)
   * *IP Addresses* (comma‑separated list)
-  * *Lease Expires (hours remaining)*
+  * *Lease Expires (hours remaining)* (PiHole DHCP reqired)
   * *MAC Vendor* (diagnostic)
   * *Device Name* (diagnostic)
 
@@ -67,11 +67,11 @@ A Home Assistant custom integration that leverages Pi‑hole’s DHCP and netw
 ### HACS
 
 1. Ensure HACS is installed.
-2. In GitHub, add this repository as a custom integration:
+2. In Home Assistant, navigate to HACS -> Custom repositories
+   * **Repository:** `https://github.com/lrehmann/pihole_dhcp`
+   * **Type: Integration**
 
-   * **URL:** `https://github.com/lrehmann/pihole_dhcp`
-3. In Home Assistant, navigate to **HACS → Integrations → + → Explore & Add Repositories**, search for **Pi‑hole DHCP Presence**, and install.
-4. Restart Home Assistant.
+3. Restart Home Assistant.
 
 ### Manual
 
@@ -97,8 +97,7 @@ Click **Submit**. The integration will appear under **Settings → Devices & Ser
 
 ### Sensors
 
-All sensors are **Diagnostic**. They will not record to the logbook.
-
+All sensors are **Diagnostic**. 
 | Entity ID Pattern                      | Friendly Name      | Unit            | State Class        |
 | -------------------------------------- | ------------------ | --------------- | ------------------ |
 | `sensor.<mac>_firstseen`               | First Seen         | ISO 8601 string | —                  |
@@ -122,100 +121,16 @@ Under **Settings → Devices & Services → Devices**, each MAC will now have:
 
 ---
 
-## Usage Examples
-
-### Lovelace Card: Presence & Stats
-
-```yaml
-type: entities
-entities:
-  - entity: device_tracker.abcdef123456_pihole
-    name: My Phone (Pi‑hole)
-  - entity: sensor.abcdef123456_querycount
-    name: Total Queries
-  - entity: sensor.abcdef123456_lastquery
-    name: Last DNS Query
-  - entity: sensor.abcdef123456_leaseexpires
-    name: Hours till Lease Expiry
-```
-
-### Automation: Notify on Absence
-
-```yaml
-alias: "Notify when My Phone Away"
-trigger:
-  - platform: state
-    entity_id: device_tracker.abcdef123456_pihole
-    to: 'not_home'
-action:
-  - service: notify.mobile_app
-    data:
-      message: "Your phone hasn't queried Pi‑hole in 30 min!"
-```
-
-— adapt `entity_id` and thresholds as needed.
-
----
-
-## Advanced Topics
-
-### Automations & Alerts
-
-* Use `sensor.<mac>_querycount`’s `total_increasing` for long‑term traffic graphs.
-* Link *Lease Expires* sensors to trigger binary sensors when < X h.
-
-### Customizing Entity Names & Icons
-
-Add in `customize.yaml`:
-
-```yaml
-sensor.abcdef123456_querycount:
-  icon: mdi:dns
-```
-
-Or set friendly names via **Settings → Entities** for clearer labels.
-
----
 
 ## Troubleshooting
 
 * **No entities created**: Check Pi‑hole API base URL and network connectivity.
-* **Duplicate devices**: Ensure other integrations don’t use `connections`; clear old device registry entries if needed.
+* **Duplicate devices**: Ensure other integrations don’t use `connections`; clear old device registry entries if needed. (Delete old network data on Pihole)
 * **Presence always Unknown**: Verify `Consider Away (s)` and HA time sync (`NTP`).
 
 Logs: Look for `pihole_dhcp` entries under **Supervisor → System → Logs**.
 
----
 
-## Development
-
-1. Fork the repo
-2. Clone locally and install dev dependencies:
-
-   ```bash
-   poetry install  # or pip install -r requirements.txt
-   ```
-3. Link your dev folder:
-
-   ```bash
-   ln -s $(pwd)/custom_components/pihole_dhcp <config>/custom_components/
-   ```
-4. Restart HA and develop.
-5. Write tests under `tests/` (pytest with `pytest-homeassistant-custom-component`).
-
----
-
-## Contributing
-
-Pull requests welcome!
-Please follow these steps:
-
-1. Open an issue describing your feature or bug.
-2. Create a branch: `git checkout -b feature/my-feature`.
-3. Commit changes and add tests.
-4. Push & open a PR.
-
----
 
 ## License
 
