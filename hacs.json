@@ -6,4 +6,7 @@
   "iot_class": "local_polling",
   "content_in_root": false,
   "render_readme": true
+  "logo": "icon.png",
+  "logo_dark": "icon.png",
+  "logo_light": "icon.png"
 }
