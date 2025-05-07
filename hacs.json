@@ -6,7 +6,6 @@
   "iot_class": "local_polling",
   "content_in_root": false,
   "render_readme": true,
-  "release_branch": "main",
   "logo": "piholepresence.png",
   "logo_dark": "piholepresence.png",
   "logo_light": "piholepresence.png"
