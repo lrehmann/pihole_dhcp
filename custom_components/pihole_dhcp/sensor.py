@@ -24,7 +24,6 @@ from .const import (
     ATTR_NAME,
 )
 
-# Define each attribute and its friendly label
 _SENSOR_DEFS: List[tuple[str, str]] = [
     (ATTR_FIRST_SEEN,   "First Seen"),
     (ATTR_LAST_QUERY,   "Last Query (s ago)"),
@@ -40,7 +39,6 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Create one diagnostic sensor per (MAC, attribute)."""
     coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     sensors = [
         PiholeAttrSensor(coordinator, mac, attr, label)
@@ -50,7 +48,6 @@ async def async_setup_entry(
     async_add_entities(sensors)
 
 class PiholeAttrSensor(CoordinatorEntity, SensorEntity):
-    """Generic diagnostic sensor for a Pi‑hole DHCP attribute."""
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(
@@ -67,7 +64,6 @@ class PiholeAttrSensor(CoordinatorEntity, SensorEntity):
         self._attr_unique_id = f"{DOMAIN}_{mac.replace(':','')}_{key}"
         self._attr_name = label
 
-        # Mark statistics
         if attr == ATTR_NUM_QUERIES:
             self._attr_state_class = SensorStateClass.TOTAL_INCREASING
         elif attr == ATTR_LAST_QUERY:
@@ -75,7 +71,6 @@ class PiholeAttrSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def native_value(self) -> Any:
-        """Return formatted value for this attribute."""
         data = self.coordinator.data[self._mac]
         val = data.get(self._attr)
         now_ts = datetime.now(timezone.utc).timestamp()
@@ -83,14 +78,13 @@ class PiholeAttrSensor(CoordinatorEntity, SensorEntity):
         if self._attr == ATTR_FIRST_SEEN and isinstance(val, (int, float)):
             return datetime.fromtimestamp(val, timezone.utc).isoformat()
         if self._attr == ATTR_LAST_QUERY and isinstance(val, (int, float)):
-            return int(now_ts - val)  # seconds ago
+            return int(now_ts - val)
         if self._attr == ATTR_DHCP_EXPIRES and isinstance(val, (int, float)):
-            return round((val - now_ts) / 3600, 1)  # hours remaining
+            return round((val - now_ts) / 3600, 1)
         return val
 
     @property
     def device_info(self) -> DeviceInfo:
-        """Attach sensor under the existing device by MAC."""
         info = self.coordinator.data[self._mac]
         name = info.get(ATTR_NAME)
         if not name or name == "*" or not name.strip():
