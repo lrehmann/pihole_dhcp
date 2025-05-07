@@ -1,7 +1,6 @@
 # Pi‑hole Presence
 
-**Version:** 0.2.1
-**Domain:** `pihole_dhcp`
+**Domain:** `pihole_presence`
 **IoT Class:** local\_polling
 
 A Home Assistant custom integration that leverages Pi‑hole’s DHCP and network status endpoints to monitor device presence and diagnostics. It unifies Pi‑hole data with your existing HA devices by matching on MAC address, exposing sensors and a device tracker for each client.
